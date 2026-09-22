@@ -2,7 +2,7 @@ CC      := x86_64-elf-gcc
 LD      := x86_64-elf-gcc
 QEMU    := qemu-system-x86_64
 XORRISO := xorriso
-LIMINE  := ./limine/limine.exe
+LIMINE  := ./limine/limine
 
 TARGET := kernel.elf
 ISO    := caramel.iso
