@@ -6,6 +6,9 @@
 
 #include <drivers/terminal/terminal.h>
 
+#define COLOR_WHITE 0xFFFFFFFFu
+#define COLOR_BLACK 0x00000000u
+
 void terminal_set_cursor(struct terminal *terminal, uint32_t x, uint32_t y)
 {
     terminal->cursor_x = x;
@@ -39,8 +42,8 @@ void terminal_init(struct terminal *terminal)
     terminal_resize(terminal, framebuffer.width, framebuffer.height);
     terminal_set_cursor(terminal, TERMINAL_MARGIN, TERMINAL_MARGIN);
     
-    terminal_set_foreground(terminal, 0xFFFFFFFF);
-    terminal_set_background(terminal, 0x00000000);
+    terminal_set_foreground(terminal, COLOR_WHITE);
+    terminal_set_background(terminal, COLOR_BLACK);
 
     terminal_clear(terminal);
 }
@@ -73,6 +76,23 @@ void terminal_tab(struct terminal *terminal)
     }
 }
 
+void terminal_backspace(struct terminal *terminal)
+{
+    if (terminal->cursor_x - FONT_ADVANCE_X < TERMINAL_MARGIN)
+    {
+        // if cursor at line beginning
+        if (terminal->cursor_y - FONT_ADVANCE_Y >= TERMINAL_MARGIN)
+        {
+            terminal_set_cursor(terminal, terminal->width - FONT_ADVANCE_X, terminal->cursor_y - FONT_ADVANCE_Y);
+        }
+    }
+    else
+    {
+        // normal backspace
+        terminal_set_cursor(terminal, terminal->cursor_x - FONT_ADVANCE_X, terminal->cursor_y);
+    }
+}
+
 void terminal_put_char(char c, struct terminal *terminal)
 {
     switch (c)
@@ -84,7 +104,7 @@ void terminal_put_char(char c, struct terminal *terminal)
             terminal_tab(terminal);
             break;
         case '\b':
-            // TODO: implement terminal_backspace()
+            terminal_backspace(terminal);
             break;
         default:
             if (terminal->cursor_x + FONT_ADVANCE_X > terminal->width)
