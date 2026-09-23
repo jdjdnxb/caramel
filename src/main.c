@@ -3,6 +3,7 @@
 #include <drivers/video/framebuffer.h>
 #include <drivers/video/text.h>
 #include <drivers/terminal/terminal.h>
+#include <tests/terminal_text.h>
 
 struct terminal kernel_terminal;
 
@@ -14,6 +15,13 @@ void main(void)
     terminal_init(&kernel_terminal);        
 
     terminal_write("Welcome to caramel!\n", &kernel_terminal);
+
+    // tests
+    test_terminal_space();
+    test_terminal_text();
+    test_terminal_space();
+    test_terminal_backspace();
+
 
     while (1)
     {
