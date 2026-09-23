@@ -20,6 +20,11 @@ make
 make run
 ```
 
+The files inside limine.dSYM are generated macOS debug symbols. No need to commit them so hide them from Git locally
+```sh
+git -C limine rev-parse --git-path info/exclude | xargs -I{} sh -c 'echo "/limine.dSYM/" >> "$1"' _ {}
+```
+
 ---
 
 ### Apple Silicon
