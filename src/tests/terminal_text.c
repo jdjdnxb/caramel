@@ -13,14 +13,24 @@ void test_terminal_text(void)
 
 void test_terminal_backspace(void)
 {
-    terminal_put_char('A', &kernel_terminal);
     terminal_put_char('B', &kernel_terminal);
-    terminal_put_char('C', &kernel_terminal);
+    terminal_put_char('B', &kernel_terminal);
     terminal_put_char('\b', &kernel_terminal);
-    terminal_put_char('X', &kernel_terminal);
+    terminal_put_char('B', &kernel_terminal);
+    terminal_put_char('B', &kernel_terminal);
 }
 
 void test_terminal_space(void)
 {
     terminal_put_char(' ', &kernel_terminal);
+}
+
+void test_terminal_newline(void)
+{
+    terminal_put_char('\n', &kernel_terminal);
+}
+
+void test_terminal_scroll(void)
+{
+    // WIP
 }

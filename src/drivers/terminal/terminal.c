@@ -93,6 +93,11 @@ void terminal_backspace(struct terminal *terminal)
     }
 }
 
+void terminal_scroll(struct terminal *terminal)
+{
+    // WIP
+}
+
 void terminal_put_char(char c, struct terminal *terminal)
 {
     switch (c)

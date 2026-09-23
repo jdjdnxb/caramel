@@ -7,7 +7,7 @@ struct framebuffer {
     uint64_t width;
     uint64_t height;
     uint64_t pitch;
-    uint16_t bpp;
+    uint16_t bpp; // bytes per pixel
 };
 
 void framebuffer_init(void);

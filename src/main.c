@@ -16,11 +16,17 @@ void main(void)
 
     terminal_write("Welcome to caramel!\n", &kernel_terminal);
 
+
+    test_terminal_newline();
+    test_terminal_newline();
+
+    
     // tests
-    test_terminal_space();
     test_terminal_text();
     test_terminal_space();
+    test_terminal_newline();
     test_terminal_backspace();
+    test_terminal_scroll();
 
 
     while (1)
