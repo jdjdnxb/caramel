@@ -24,4 +24,6 @@ void terminal_init(struct terminal *terminal);
 void terminal_newline(struct terminal *terminal);
 void terminal_tab(struct terminal *terminal);
 void terminal_put_char(char c, struct terminal *terminal);
+void terminal_backspace(struct terminal *terminal);
+
 void terminal_write(const char *s, struct terminal *terminal);

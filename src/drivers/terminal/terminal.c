@@ -61,7 +61,7 @@ void terminal_newline(struct terminal *terminal)
 
 void terminal_tab(struct terminal *terminal)
 {
-    // The tab size is measured in spaces, so multiply it by the width to get the actual length
+    // The tab size is measured in spaces, so multiply it by the font width to get the actual length
     uint32_t target_x = terminal->cursor_x + (TAB_SIZE * FONT_WIDTH);
     if (target_x > terminal->width)
     {
@@ -71,6 +71,17 @@ void terminal_tab(struct terminal *terminal)
     {
         terminal_set_cursor(terminal, target_x, terminal->cursor_y);
     }
+}
+
+void terminal_backspace(struct terminal *terminal)
+{
+    if (terminal->cursor_x <= TERMINAL_MARGIN)
+    {
+        return;
+    }
+
+    terminal_set_cursor(terminal, terminal->cursor_x - FONT_ADVANCE_X, terminal->cursor_y);
+    text_render_char(' ', terminal->cursor_x, terminal->cursor_y, terminal->foreground, terminal->background);
 }
 
 void terminal_put_char(char c, struct terminal *terminal)
@@ -84,7 +95,7 @@ void terminal_put_char(char c, struct terminal *terminal)
             terminal_tab(terminal);
             break;
         case '\b':
-            // TODO: implement terminal_backspace()
+            terminal_backspace(terminal);
             break;
         default:
             if (terminal->cursor_x + FONT_ADVANCE_X > terminal->width)

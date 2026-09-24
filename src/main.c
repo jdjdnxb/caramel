@@ -12,8 +12,7 @@ void main(void)
     framebuffer_clear(0x00000000);
 
     terminal_init(&kernel_terminal);        
-
-    terminal_write("Welcome to caramel!\n", &kernel_terminal);
+    terminal_write("Welcome to caramel!", &kernel_terminal);
 
     while (1)
     {
