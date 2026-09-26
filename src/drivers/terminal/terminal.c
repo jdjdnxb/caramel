@@ -84,7 +84,7 @@ void terminal_backspace(struct terminal *terminal)
     text_render_char(' ', terminal->cursor_x, terminal->cursor_y, terminal->foreground, terminal->background);
 }
 
-void terminal_put_char(char c, struct terminal *terminal)
+void terminal_put_char(struct terminal *terminal, char c)
 {
     switch (c)
     {
@@ -107,11 +107,11 @@ void terminal_put_char(char c, struct terminal *terminal)
     }
 }
 
-void terminal_write(const char *str, struct terminal *terminal)
+void terminal_write(struct terminal *terminal, const char *s)
 {
-    while (*str)
+    while (*s)
     {
-        terminal_put_char(*str, terminal);
-        str++;
+        terminal_put_char(terminal, *s);
+        s++;
     }
 }

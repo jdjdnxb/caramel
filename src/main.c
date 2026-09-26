@@ -5,17 +5,19 @@
 #include <drivers/terminal/terminal.h>
 #include <arch/x86_64/idt/idt.h>
 
+#include <kprintf.h>
+
 struct terminal kernel_terminal;
 
 void main(void)
 {
     framebuffer_init();
     framebuffer_clear(0x00000000);
-    
+    terminal_init(&kernel_terminal);
+
     x86_64_idt_init();
     
-    terminal_init(&kernel_terminal);        
-    terminal_write("Welcome to caramel!", &kernel_terminal);
+    kprintf("Welcome to caramel!");
 
     while (1)
     {
