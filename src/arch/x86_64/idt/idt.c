@@ -1,6 +1,8 @@
 #include <stdint.h>
 
 #include <arch/x86_64/idt/idt.h>
+#include <arch/x86_64/idt/exceptions.h>
+
 #include <kprintf.h>
 
 static struct x86_64_idtr idtr;
@@ -35,16 +37,20 @@ void x86_64_idt_install(uint8_t vector, uint8_t gate_type, uint8_t dpl, void *ha
     kprintf("Installed handler with address %x. Vector: %u, Gate Type: %X, DPL: %X.\n", handler_address, vector, gate_type, dpl);
 }
 
-__attribute__((interrupt))
-void test(struct interrupt_frame *frame)
+static void exception_handlers_install(void)
 {
-    (void)frame;
-    while(1) { __asm__ volatile ("hlt"); }
+    // I'll remove the magic numbers later...
+    x86_64_idt_install(0, X86_64_GATE_TYPE_INTERRUPT, DPL_RING_0, &exception_divide_error);
+    x86_64_idt_install(4, X86_64_GATE_TYPE_TRAP, DPL_RING_0, &exception_overflow);
+    x86_64_idt_install(6, X86_64_GATE_TYPE_INTERRUPT, DPL_RING_0, &exception_invalid_opcode);
+    x86_64_idt_install(8, X86_64_GATE_TYPE_INTERRUPT, DPL_RING_0, &exception_double_fault);
+    x86_64_idt_install(13, X86_64_GATE_TYPE_INTERRUPT, DPL_RING_0, &exception_general_protection);
+    x86_64_idt_install(14, X86_64_GATE_TYPE_INTERRUPT, DPL_RING_0, &exception_page_fault);
 }
 
 void x86_64_idt_init(void)
 {
-    x86_64_idt_install(3, X86_64_GATE_TYPE_INTERRUPT, DPL_RING_0, &test);
+    exception_handlers_install();
 
     idtr.offset = (uint64_t)(idt);      // Linear address of the IDT must be 64 bits wide in long mode 
     idtr.size   = sizeof(idt) - 1;

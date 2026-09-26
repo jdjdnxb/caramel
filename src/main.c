@@ -18,6 +18,9 @@ void main(void)
     x86_64_idt_init();
     
     kprintf("Welcome to caramel!");
+    
+    volatile int *totally_super_mega_valid_pointer = 0x0;
+    *totally_super_mega_valid_pointer = 0x1337;
 
     while (1)
     {
