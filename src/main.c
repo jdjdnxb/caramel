@@ -19,9 +19,6 @@ void main(void)
     
     kprintf("Welcome to caramel!");
     
-    volatile int *totally_super_mega_valid_pointer = 0x0;
-    *totally_super_mega_valid_pointer = 0x1337;
-
     while (1)
     {
         __asm__ volatile("hlt");

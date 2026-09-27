@@ -10,6 +10,10 @@
 #define DPL_RING_1  0x1
 #define DPL_RING_0  0x0
 
+#define X86_64_IDT_ATTRIBUTE_PRESENT            (1 << 7)
+#define X86_64_IDT_ATTRIBUTE_DPL(x)             (((x) & 0x3) << 5)
+#define X86_64_IDT_ATTRIBUTE_GATE_TYPE(x)       ((x) & 0xF)
+
 struct interrupt_frame {
     uint64_t rip;
     uint64_t cs;
@@ -34,4 +38,11 @@ struct x86_64_idt {
 }__attribute__((packed));
 
 void x86_64_idt_init(void);
-void x86_64_idt_install(uint8_t vector, uint8_t gate_type, uint8_t dpl, void *handler);
+void X86_64_idt_install(uint8_t vector, uint8_t gate_type, uint8_t dpl, void *handler); 
+
+#define X86_64_EXCEPTION_DIVIDE_ERROR       0
+#define X86_64_EXCEPTION_OVERFLOW           4
+#define X86_64_EXCEPTION_INVALID_OPCODE     6
+#define X86_64_EXCEPTION_DOUBLE_FAULT       8
+#define X86_64_EXCEPTION_GENERAL_PROTECTION 13
+#define X86_64_EXCEPTION_PAGE_FAULT         14
