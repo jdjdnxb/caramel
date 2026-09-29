@@ -1,4 +1,5 @@
 CC      := x86_64-elf-gcc
+AS      := nasm
 LD      := x86_64-elf-gcc
 QEMU    := qemu-system-x86_64
 XORRISO := xorriso
@@ -10,8 +11,13 @@ ISO    := caramel.iso
 BUILD    := build
 ISO_ROOT := $(BUILD)/iso_root
 
-SOURCES := $(shell find src boot -type f -name '*.c')
-OBJECTS := $(SOURCES:%.c=$(BUILD)/%.o)
+C_SOURCES := $(shell find src boot -type f -name '*.c')
+S_SOURCES := $(shell find src boot -type f -name '*.s')
+
+C_OBJECTS := $(C_SOURCES:%.c=$(BUILD)/%.o)
+S_OBJECTS := $(S_SOURCES:%.s=$(BUILD)/%.o)
+
+OBJECTS := $(C_OBJECTS) $(S_OBJECTS)
 
 CFLAGS := \
 	-std=c23 \
@@ -50,10 +56,15 @@ $(BUILD)/%.o: %.c
 	@printf '  CC  %s\n' "$<"
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(BUILD)/%.o: %.s
+	@mkdir -p $(dir $@)
+	@printf '  AS  %s\n' "$<"
+	$(AS) -f elf64 $< -o $@
+
 .PHONY: iso
 iso: $(ISO)
 
-$(ISO): $(TARGET) limine.conf 
+$(ISO): $(TARGET) limine.conf
 	@rm -rf $(ISO_ROOT)
 
 	@mkdir -p \
@@ -96,7 +107,6 @@ $(ISO): $(TARGET) limine.conf
 		-o $(ISO)
 
 	$(LIMINE) bios-install $(ISO)
-
 
 .PHONY: run
 run: $(ISO)

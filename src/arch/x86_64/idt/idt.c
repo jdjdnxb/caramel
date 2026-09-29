@@ -3,6 +3,7 @@
 #include <arch/x86_64/idt/idt.h>
 #include <arch/x86_64/idt/exceptions.h>
 
+#include <panic.h>
 #include <kprintf.h>
 
 static struct x86_64_idtr idtr;
@@ -38,12 +39,12 @@ void x86_64_idt_install(uint8_t vector, uint8_t gate_type, uint8_t dpl, void *ha
 
 static void exception_handlers_install(void)
 {
-    x86_64_idt_install(X86_64_EXCEPTION_DIVIDE_ERROR, X86_64_GATE_TYPE_INTERRUPT, DPL_RING_0, &exception_divide_error);
-    x86_64_idt_install(X86_64_EXCEPTION_OVERFLOW, X86_64_GATE_TYPE_TRAP, DPL_RING_0, &exception_overflow);
-    x86_64_idt_install(X86_64_EXCEPTION_INVALID_OPCODE, X86_64_GATE_TYPE_INTERRUPT, DPL_RING_0, &exception_invalid_opcode);
-    x86_64_idt_install(X86_64_EXCEPTION_DOUBLE_FAULT, X86_64_GATE_TYPE_INTERRUPT, DPL_RING_0, &exception_double_fault);
-    x86_64_idt_install(X86_64_EXCEPTION_GENERAL_PROTECTION, X86_64_GATE_TYPE_INTERRUPT, DPL_RING_0, &exception_general_protection);
-    x86_64_idt_install(X86_64_EXCEPTION_PAGE_FAULT, X86_64_GATE_TYPE_INTERRUPT, DPL_RING_0, &exception_page_fault);
+    x86_64_idt_install(X86_64_EXCEPTION_DIVIDE_ERROR, X86_64_GATE_TYPE_INTERRUPT, DPL_RING_0, isr_stub_0);
+    x86_64_idt_install(X86_64_EXCEPTION_OVERFLOW, X86_64_GATE_TYPE_TRAP, DPL_RING_0, isr_stub_4);
+    x86_64_idt_install(X86_64_EXCEPTION_INVALID_OPCODE, X86_64_GATE_TYPE_INTERRUPT, DPL_RING_0, isr_stub_6);
+    x86_64_idt_install(X86_64_EXCEPTION_DOUBLE_FAULT, X86_64_GATE_TYPE_INTERRUPT, DPL_RING_0, isr_stub_8);
+    x86_64_idt_install(X86_64_EXCEPTION_GENERAL_PROTECTION, X86_64_GATE_TYPE_INTERRUPT, DPL_RING_0, isr_stub_13);
+    x86_64_idt_install(X86_64_EXCEPTION_PAGE_FAULT, X86_64_GATE_TYPE_INTERRUPT, DPL_RING_0, isr_stub_14); 
 }
 
 void x86_64_idt_init(void)
