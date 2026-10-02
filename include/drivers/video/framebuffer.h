@@ -2,7 +2,8 @@
 
 #include <stdint.h>
 
-struct framebuffer {
+struct framebuffer 
+{
     void *address;
     uint64_t width;
     uint64_t height;

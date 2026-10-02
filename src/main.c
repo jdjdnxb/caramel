@@ -4,6 +4,7 @@
 #include <drivers/video/text.h>
 #include <drivers/terminal/terminal.h>
 #include <arch/x86_64/idt/idt.h>
+#include <arch/x86_64/gdt/gdt.h>
 
 #include <kprintf.h>
 
@@ -15,6 +16,7 @@ void main(void)
     framebuffer_clear(0x00000000);
     terminal_init(&kernel_terminal);
 
+    x86_64_gdt_init();
     x86_64_idt_init();
     
     kprintf("Welcome to caramel!");

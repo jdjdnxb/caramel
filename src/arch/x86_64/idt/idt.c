@@ -6,8 +6,8 @@
 #include <panic.h>
 #include <kprintf.h>
 
-static struct x86_64_idtr idtr;
-static struct x86_64_idt  idt[256];
+static struct x86_64_idtr       idtr;
+static struct x86_64_idt_entry  idt[256];
 
 static inline void lidt(struct x86_64_idtr *idtr)
 {
@@ -19,32 +19,34 @@ static inline void lidt(struct x86_64_idtr *idtr)
 void x86_64_idt_install(uint8_t vector, uint8_t gate_type, uint8_t dpl, void *handler)
 {
     uint64_t handler_address = (uint64_t)handler; 
+    
+    struct x86_64_idt_entry *entry = &idt[vector];
 
-    idt[vector].offset_low   = (uint16_t)(handler_address & 0xFFFF);              // Lower 16 bits 
-    idt[vector].offset_mid   = (uint16_t)((handler_address >> 16) & 0xFFFF);      // Bits 15..31
-    idt[vector].offset_high  = (uint32_t)((handler_address >> 32) & 0xFFFFFFFF);  // Higher 32 bits
+    entry->offset_low   = (uint16_t)(handler_address & 0xFFFF);              // Lower 16 bits 
+    entry->offset_mid   = (uint16_t)((handler_address >> 16) & 0xFFFF);      // Bits 15..31
+    entry->offset_high  = (uint32_t)((handler_address >> 32) & 0xFFFFFFFF);  // Higher 32 bits
 
-    idt[vector].selector     = 0x28;
-    idt[vector].ist          = 0x00;        // No IST for now
+    entry->selector     = 0x28;
+    entry->ist          = 0x00;        // No IST for now
     
     // Bit 0..3 = gate type
     // Bit 5..6 = dpl
     // Bit 7    = present attribute
-    idt[vector].attributes   = X86_64_IDT_ATTRIBUTE_PRESENT | X86_64_IDT_ATTRIBUTE_DPL(dpl) | X86_64_IDT_ATTRIBUTE_GATE_TYPE(gate_type); 
+    entry->attributes   = X86_64_IDT_ATTRIBUTE_PRESENT | X86_64_IDT_ATTRIBUTE_DPL(dpl) | X86_64_IDT_ATTRIBUTE_GATE_TYPE(gate_type); 
 
-    idt[vector].reserved     = 0x00;
+    entry->reserved     = 0x00;
 
-    kprintf("Installed handler with address %lx. Vector: %u, Gate Type: %X, DPL: %X.\n", handler_address, vector, gate_type, dpl);
+    kprintf("Installed handler with address %llx. Vector: %u, Gate Type: %llx, DPL: %llx.\n", handler_address, vector, gate_type, dpl);
 }
 
 static void exception_handlers_install(void)
 {
-    x86_64_idt_install(X86_64_EXCEPTION_DIVIDE_ERROR, X86_64_GATE_TYPE_INTERRUPT, DPL_RING_0, isr_stub_0);
-    x86_64_idt_install(X86_64_EXCEPTION_OVERFLOW, X86_64_GATE_TYPE_TRAP, DPL_RING_0, isr_stub_4);
-    x86_64_idt_install(X86_64_EXCEPTION_INVALID_OPCODE, X86_64_GATE_TYPE_INTERRUPT, DPL_RING_0, isr_stub_6);
-    x86_64_idt_install(X86_64_EXCEPTION_DOUBLE_FAULT, X86_64_GATE_TYPE_INTERRUPT, DPL_RING_0, isr_stub_8);
-    x86_64_idt_install(X86_64_EXCEPTION_GENERAL_PROTECTION, X86_64_GATE_TYPE_INTERRUPT, DPL_RING_0, isr_stub_13);
-    x86_64_idt_install(X86_64_EXCEPTION_PAGE_FAULT, X86_64_GATE_TYPE_INTERRUPT, DPL_RING_0, isr_stub_14); 
+    x86_64_idt_install(X86_64_EXCEPTION_DIVIDE_ERROR, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_0);
+    x86_64_idt_install(X86_64_EXCEPTION_OVERFLOW, X86_64_GATE_TYPE_TRAP, X86_64_IDT_DPL_RING_0, isr_stub_4);
+    x86_64_idt_install(X86_64_EXCEPTION_INVALID_OPCODE, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_6);
+    x86_64_idt_install(X86_64_EXCEPTION_DOUBLE_FAULT, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_8);
+    x86_64_idt_install(X86_64_EXCEPTION_GENERAL_PROTECTION, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_13);
+    x86_64_idt_install(X86_64_EXCEPTION_PAGE_FAULT, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_14); 
 }
 
 void x86_64_idt_init(void)
@@ -54,7 +56,7 @@ void x86_64_idt_init(void)
     idtr.offset = (uint64_t)(idt);      // Linear address of the IDT must be 64 bits wide in long mode 
     idtr.size   = sizeof(idt) - 1;
 
-    kprintf("IDTR Offset: %lx.\nIDTR Size: %u.\n", idtr.offset, idtr.size);
+    kprintf("IDTR Offset: %llx.\nIDTR Size: %llu.\n", idtr.offset, idtr.size);
 
     lidt(&idtr);
 

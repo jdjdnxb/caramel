@@ -5,16 +5,17 @@
 #define X86_64_GATE_TYPE_INTERRUPT 0xE
 #define X86_64_GATE_TYPE_TRAP      0xF
 
-#define DPL_RING_3  0x3
-#define DPL_RING_2  0x2
-#define DPL_RING_1  0x1
-#define DPL_RING_0  0x0
+#define X86_64_IDT_DPL_RING_3  0x3
+#define X86_64_IDT_DPL_RING_2  0x2
+#define X86_64_IDT_DPL_RING_1  0x1
+#define X86_64_IDT_DPL_RING_0  0x0
 
 #define X86_64_IDT_ATTRIBUTE_PRESENT            (1 << 7)
 #define X86_64_IDT_ATTRIBUTE_DPL(x)             (((x) & 0x3) << 5)
 #define X86_64_IDT_ATTRIBUTE_GATE_TYPE(x)       ((x) & 0xF)
 
-struct interrupt_frame {
+struct interrupt_frame 
+{
     uint64_t rax;
     uint64_t rbx;
     uint64_t rcx;
@@ -41,12 +42,14 @@ struct interrupt_frame {
     uint64_t ss;
 };
 
-struct x86_64_idtr {
+struct x86_64_idtr
+{
     uint16_t size;
     uint64_t offset;
 }__attribute__((packed));
 
-struct x86_64_idt {
+struct x86_64_idt_entry 
+{
     uint16_t offset_low;
     uint16_t selector;
     uint8_t  ist;           // Only bits 0..2 are used, they hold the IST offset
