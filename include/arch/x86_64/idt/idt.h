@@ -51,7 +51,7 @@ struct x86_64_idtr
 struct x86_64_idt_entry 
 {
     uint16_t offset_low;
-    uint16_t selector;
+    uint16_t selector;      // Kernel code selector
     uint8_t  ist;           // Only bits 0..2 are used, they hold the IST offset
     uint8_t  attributes;    // Gate type, DPL and p fields
     uint16_t offset_mid;
@@ -60,7 +60,7 @@ struct x86_64_idt_entry
 }__attribute__((packed));
 
 void x86_64_idt_init(void);
-void x86_64_idt_install(uint8_t vector, uint8_t gate_type, uint8_t dpl, void *handler);
+void x86_64_idt_install(uint8_t vector, uint8_t ist_index, uint8_t gate_type, uint8_t dpl, void *handler);
 
 #define X86_64_EXCEPTION_DIVIDE_ERROR       0
 #define X86_64_EXCEPTION_OVERFLOW           4

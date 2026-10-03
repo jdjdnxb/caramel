@@ -1,5 +1,6 @@
 #include <stdint.h>
 
+#include <arch/x86_64/gdt/gdt.h>
 #include <arch/x86_64/idt/idt.h>
 #include <arch/x86_64/idt/exceptions.h>
 
@@ -15,8 +16,9 @@ static inline void lidt(struct x86_64_idtr *idtr)
 }
 
 // Gate type MUST be 0xE (interrupt) or 0xF (trap)
-// DPL must be 0x3 (ring 3), 0x2 (ring 2), 0x1 (ring 1), 0x0 (ring 0). Hardware interrupts ignore the DPL
-void x86_64_idt_install(uint8_t vector, uint8_t gate_type, uint8_t dpl, void *handler)
+// DPL must be 0x3 (ring 3), 0x2 (ring 2), 0x1 (ring 1), 0x0 (ring 0). Hardware interrupts ignore the DPL.
+// If the IST index is zero, a modified version of the legacy stack-switching mechanism is used.
+void x86_64_idt_install(uint8_t vector, uint8_t ist_index, uint8_t gate_type, uint8_t dpl, void *handler)
 {
     uint64_t handler_address = (uint64_t)handler; 
     
@@ -26,27 +28,27 @@ void x86_64_idt_install(uint8_t vector, uint8_t gate_type, uint8_t dpl, void *ha
     entry->offset_mid   = (uint16_t)((handler_address >> 16) & 0xFFFF);      // Bits 15..31
     entry->offset_high  = (uint32_t)((handler_address >> 32) & 0xFFFFFFFF);  // Higher 32 bits
 
-    entry->selector     = 0x28;
-    entry->ist          = 0x00;        // No IST for now
-    
-    // Bit 0..3 = gate type
-    // Bit 5..6 = dpl
+    entry->selector     = X86_64_KERNEL_CODE_SELECTOR;
+    entry->ist          = ist_index;
+
+    // Bits 0..3 = gate type
+    // Bits 5..6 = dpl
     // Bit 7    = present attribute
     entry->attributes   = X86_64_IDT_ATTRIBUTE_PRESENT | X86_64_IDT_ATTRIBUTE_DPL(dpl) | X86_64_IDT_ATTRIBUTE_GATE_TYPE(gate_type); 
 
     entry->reserved     = 0x00;
 
-    kprintf("Installed handler with address %llx. Vector: %u, Gate Type: %llx, DPL: %llx.\n", handler_address, vector, gate_type, dpl);
+    kprintf("Installed handler with address %llx. Vector: %u, IST: %u, Gate Type: %llx, DPL: %llx.\n", handler_address, vector, ist_index, gate_type, dpl);
 }
 
 static void exception_handlers_install(void)
 {
-    x86_64_idt_install(X86_64_EXCEPTION_DIVIDE_ERROR, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_0);
-    x86_64_idt_install(X86_64_EXCEPTION_OVERFLOW, X86_64_GATE_TYPE_TRAP, X86_64_IDT_DPL_RING_0, isr_stub_4);
-    x86_64_idt_install(X86_64_EXCEPTION_INVALID_OPCODE, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_6);
-    x86_64_idt_install(X86_64_EXCEPTION_DOUBLE_FAULT, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_8);
-    x86_64_idt_install(X86_64_EXCEPTION_GENERAL_PROTECTION, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_13);
-    x86_64_idt_install(X86_64_EXCEPTION_PAGE_FAULT, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_14); 
+    x86_64_idt_install(X86_64_EXCEPTION_DIVIDE_ERROR, 0, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_0);
+    x86_64_idt_install(X86_64_EXCEPTION_OVERFLOW, 0, X86_64_GATE_TYPE_TRAP, X86_64_IDT_DPL_RING_0, isr_stub_4);
+    x86_64_idt_install(X86_64_EXCEPTION_INVALID_OPCODE, 0, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_6);
+    x86_64_idt_install(X86_64_EXCEPTION_DOUBLE_FAULT, 1, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_8);
+    x86_64_idt_install(X86_64_EXCEPTION_GENERAL_PROTECTION, 0, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_13);
+    x86_64_idt_install(X86_64_EXCEPTION_PAGE_FAULT, 0, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_14); 
 }
 
 void x86_64_idt_init(void)

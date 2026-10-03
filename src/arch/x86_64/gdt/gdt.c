@@ -37,14 +37,17 @@ static void gdt_init_kernel_data(void)
     entry->access          = 0x92;
 
     // G = 1, D/B = 0, L = 0, limit[19:16] = 0xF
-    entry->flags_limit     = 0xFC;
+    entry->flags_limit     = 0xF8;
 }
+
+// IST stacks
+uint8_t ist_stack_double_fault[IST_STACK_SIZE] __attribute__((aligned(16)));
 
 static void gdt_init_tss(void)
 {
     uint64_t tss_linear = (uint64_t)&tss;
 
-    // Start at index 6 (gdt + 0x28) so we can keep the user info below later
+    // Start at index 5 (gdt + 0x28) so we can keep the user info below later
     struct x86_64_tss_descriptor *entry = &tss_descriptor;
 
     entry->limit       = sizeof(tss) - 1;
@@ -61,6 +64,35 @@ static void gdt_init_tss(void)
     entry->reserved    = 0;
 
     *(struct x86_64_tss_descriptor*)&gdt[5] = tss_descriptor;
+
+    tss.ist1 = (uintptr_t)(ist_stack_double_fault + IST_STACK_SIZE); 
+}
+
+static inline void cs_reload(void)
+{
+    __asm__ volatile (
+        "pushq %0\n\t"
+        "leaq 1f(%%rip), %%rax\n\t"
+        "pushq %%rax\n\t"
+        "lretq\n\t"
+        "1:"
+        :
+        : "i"(X86_64_KERNEL_CODE_SELECTOR)
+        : "rax", "memory"
+    );
+}
+
+static inline void data_segments_reload(void)
+{
+    __asm__ volatile (
+        "movw %0, %%ax\n\t"
+        "movw %%ax, %%ds\n\t"
+        "movw %%ax, %%es\n\t"
+        "movw %%ax, %%ss\n\t"
+        :
+        : "i"(X86_64_KERNEL_DATA_SELECTOR)
+        : "rax", "memory"
+    );
 }
 
 static inline void lgdt(struct x86_64_gdtr *gdtr)
@@ -84,7 +116,14 @@ void x86_64_gdt_init(void)
 
     lgdt(&gdtr);
     kprintf("Loaded GDT successfully. We're no longer using Limine's GDT!\n");
+   
+    // We need to reload CS + the other data segments so we don't use the cached Limine ones
+    cs_reload();
+    kprintf("Reloaded CS.\n");
 
-    ltr(0x28);
+    data_segments_reload();
+    kprintf("Reloaded data segments.\n");
+
+    ltr(X86_64_TSS_SELECTOR);
     kprintf("Loaded task register.\n");
 }

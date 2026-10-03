@@ -2,6 +2,12 @@
 
 #include <stdint.h>
 
+#define IST_STACK_SIZE 4096
+
+#define X86_64_KERNEL_CODE_SELECTOR 0x08
+#define X86_64_KERNEL_DATA_SELECTOR 0x10
+#define X86_64_TSS_SELECTOR         0x28
+
 struct x86_64_gdtr 
 {
     uint16_t size;
