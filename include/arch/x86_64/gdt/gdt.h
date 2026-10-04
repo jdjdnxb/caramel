@@ -54,7 +54,7 @@ struct x86_64_tss
     uint64_t ist6;
     uint64_t ist7;
     
-    uint32_t reserved_2;
+    uint64_t reserved_2;
     uint16_t reserved_3;
     
     uint16_t iopb;      // I/O Permission bitmap

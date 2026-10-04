@@ -62,16 +62,24 @@ struct x86_64_idt_entry
 void x86_64_idt_init(void);
 void x86_64_idt_install(uint8_t vector, uint8_t ist_index, uint8_t gate_type, uint8_t dpl, void *handler);
 
-#define X86_64_EXCEPTION_DIVIDE_ERROR       0
-#define X86_64_EXCEPTION_OVERFLOW           4
-#define X86_64_EXCEPTION_INVALID_OPCODE     6
-#define X86_64_EXCEPTION_DOUBLE_FAULT       8
-#define X86_64_EXCEPTION_GENERAL_PROTECTION 13
-#define X86_64_EXCEPTION_PAGE_FAULT         14
+#define X86_64_EXCEPTION_DIVIDE_ERROR           0
+#define X86_64_EXCEPTION_NON_MASKABLE_INTERRUPT 2
+#define X86_64_EXCEPTION_OVERFLOW               4
+#define X86_64_EXCEPTION_INVALID_OPCODE         6
+#define X86_64_EXCEPTION_DEVICE_NOT_AVAILABLE   7
+#define X86_64_EXCEPTION_DOUBLE_FAULT           8
+#define X86_64_EXCEPTION_INVALID_TSS            10
+#define X86_64_EXCEPTION_GENERAL_PROTECTION     13
+#define X86_64_EXCEPTION_PAGE_FAULT             14
+#define X86_64_EXCEPTION_CONTROL_PROTECTION     21
 
 extern void isr_stub_0(void);
+extern void isr_stub_2(void);
 extern void isr_stub_4(void);
 extern void isr_stub_6(void);
+extern void isr_stub_7(void);
 extern void isr_stub_8(void);
+extern void isr_stub_10(void);
 extern void isr_stub_13(void);
 extern void isr_stub_14(void);
+extern void isr_stub_21(void);

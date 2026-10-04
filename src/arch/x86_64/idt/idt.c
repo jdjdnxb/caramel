@@ -33,7 +33,7 @@ void x86_64_idt_install(uint8_t vector, uint8_t ist_index, uint8_t gate_type, ui
 
     // Bits 0..3 = gate type
     // Bits 5..6 = dpl
-    // Bit 7    = present attribute
+    // Bit 7     = present attribute
     entry->attributes   = X86_64_IDT_ATTRIBUTE_PRESENT | X86_64_IDT_ATTRIBUTE_DPL(dpl) | X86_64_IDT_ATTRIBUTE_GATE_TYPE(gate_type); 
 
     entry->reserved     = 0x00;
@@ -44,11 +44,15 @@ void x86_64_idt_install(uint8_t vector, uint8_t ist_index, uint8_t gate_type, ui
 static void exception_handlers_install(void)
 {
     x86_64_idt_install(X86_64_EXCEPTION_DIVIDE_ERROR, 0, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_0);
+    x86_64_idt_install(X86_64_EXCEPTION_NON_MASKABLE_INTERRUPT, 0, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_2);
     x86_64_idt_install(X86_64_EXCEPTION_OVERFLOW, 0, X86_64_GATE_TYPE_TRAP, X86_64_IDT_DPL_RING_0, isr_stub_4);
     x86_64_idt_install(X86_64_EXCEPTION_INVALID_OPCODE, 0, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_6);
+    x86_64_idt_install(X86_64_EXCEPTION_DEVICE_NOT_AVAILABLE, 0, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_7);
     x86_64_idt_install(X86_64_EXCEPTION_DOUBLE_FAULT, 1, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_8);
+    x86_64_idt_install(X86_64_EXCEPTION_INVALID_TSS, 0, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_10);
     x86_64_idt_install(X86_64_EXCEPTION_GENERAL_PROTECTION, 0, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_13);
-    x86_64_idt_install(X86_64_EXCEPTION_PAGE_FAULT, 0, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_14); 
+    x86_64_idt_install(X86_64_EXCEPTION_PAGE_FAULT, 0, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_14);
+    x86_64_idt_install(X86_64_EXCEPTION_CONTROL_PROTECTION, 0, X86_64_GATE_TYPE_INTERRUPT, X86_64_IDT_DPL_RING_0, isr_stub_21);
 }
 
 void x86_64_idt_init(void)

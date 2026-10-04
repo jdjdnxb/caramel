@@ -11,6 +11,12 @@ void exception_divide_error(struct interrupt_frame *frame)
     panic_end();
 }
 
+void exception_non_maskable_interrupt(struct interrupt_frame *frame)
+{
+    panic("Exception: NMI.", frame);
+    panic_end();
+}
+
 void exception_overflow(struct interrupt_frame *frame)
 {
     panic("Exception: Overflow.", frame); 
@@ -23,9 +29,21 @@ void exception_invalid_opcode(struct interrupt_frame *frame)
     panic_end();
 }
 
+void exception_device_not_available(struct interrupt_frame *frame)
+{
+    panic("Exception: Device Not Available.", frame);
+    panic_end();
+}
+
 void exception_double_fault(struct interrupt_frame *frame)
 {
     panic("Exception: Double Fault.", frame);
+    panic_end();
+}
+
+void exception_invalid_tss(struct interrupt_frame *frame)
+{
+    panic("Exception: Invalid TSS.", frame);
     panic_end();
 }
 
@@ -52,5 +70,11 @@ void exception_page_fault(struct interrupt_frame *frame)
     kprintf("  CR4:    %016llx\n", cr4);
     kprintf("\n");
 
+    panic_end();
+}
+
+void exception_control_protection(struct interrupt_frame *frame)
+{
+    panic("Exception: Control Protection.", frame);
     panic_end();
 }

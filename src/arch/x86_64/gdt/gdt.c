@@ -2,6 +2,7 @@
 #include <kprintf.h>
 
 #include <arch/x86_64/gdt/gdt.h>
+#include <arch/x86_64/idt/idt.h>
 
 static struct x86_64_gdtr gdtr;
 static struct x86_64_segment_descriptor gdt[256];
@@ -21,7 +22,7 @@ static void gdt_init_kernel_code(void)
     entry->access       = 0x9A;
 
     // G = 1, D/B = 0, L = 1, limit[19:16] = 0xF
-    entry->flags_limit  = 0xFA;
+    entry->flags_limit  = 0xAF;
 }
 
 static void gdt_init_kernel_data(void)
@@ -37,7 +38,7 @@ static void gdt_init_kernel_data(void)
     entry->access          = 0x92;
 
     // G = 1, D/B = 0, L = 0, limit[19:16] = 0xF
-    entry->flags_limit     = 0xF8;
+    entry->flags_limit     = 0xCF;
 }
 
 // IST stacks
@@ -116,7 +117,7 @@ void x86_64_gdt_init(void)
 
     lgdt(&gdtr);
     kprintf("Loaded GDT successfully. We're no longer using Limine's GDT!\n");
-   
+    
     // We need to reload CS + the other data segments so we don't use the cached Limine ones
     cs_reload();
     kprintf("Reloaded CS.\n");
