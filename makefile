@@ -42,8 +42,9 @@ LDFLAGS := \
 	-g
 
 QEMU_FLAGS := \
-	-m 512M \
-	-serial stdio
+        -machine q35 \
+        -m 512M \
+        -serial stdio
 
 .PHONY: all
 all: $(ISO)

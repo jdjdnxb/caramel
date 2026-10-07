@@ -24,4 +24,9 @@ __attribute__((used, section(".limine_requests"))) volatile struct limine_kernel
     .revision = 0
 };
 
+__attribute__((used, section(".limine_requests"))) volatile struct limine_rsdp_request rsdp_request = {
+    .id = LIMINE_RSDP_REQUEST,
+    .revision = 0
+};
+
 __attribute__((used, section(".limine_requests_end"))) LIMINE_REQUESTS_END_MARKER

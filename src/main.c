@@ -1,8 +1,11 @@
 #include <stdint.h>
 #include <boot/requests.h>
+
 #include <drivers/video/framebuffer.h>
 #include <drivers/video/text.h>
 #include <drivers/terminal/terminal.h>
+#include <drivers/acpi/acpi.h>
+
 #include <arch/x86_64/idt/idt.h>
 #include <arch/x86_64/gdt/gdt.h>
 
@@ -18,7 +21,9 @@ void main(void)
 
     x86_64_gdt_init();
     x86_64_idt_init();
-    
+
+    acpi_init();
+
     kprintf("Welcome to caramel!");
     
     while (1)
