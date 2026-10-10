@@ -1,7 +1,7 @@
 #pragma once
 
 /*
- *  signature - an 8 byte magic number used for locating the RSDP/XSDP, containing "RSP PTR ". Including the trailing character.
+ *  signature - an 8 byte magic number used for locating the RSDP/XSDP, containing "RSD PTR ". Including the trailing character.
  *  checksum - a byte used to verify the first 20 bytes of the RSDP.
  *  oemid - an OEM-supplied string that identifies the OEM.
  *  revision - the revision of this structure.
@@ -40,3 +40,6 @@ struct acpi_xsdp
 
 static_assert(sizeof(struct acpi_rsdp) == 20);
 static_assert(sizeof(struct acpi_xsdp) == 36);
+
+bool acpi_rsdp_validate(const struct acpi_rsdp *rsdp);
+bool acpi_xsdp_validate(const struct acpi_xsdp *xsdp);

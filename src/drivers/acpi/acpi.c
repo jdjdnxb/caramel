@@ -4,6 +4,8 @@
 
 #include <drivers/acpi/acpi.h>
 #include <drivers/acpi/rsdp.h>
+#include <drivers/acpi/sdt.h>
+#include <drivers/acpi/madt.h>
 
 #include <limine.h>
 #include <kprintf.h>
@@ -38,6 +40,12 @@ void acpi_init(void)
             kprintf("RSDP invalid. Stopping the ACPI initialization process.\n");
             return;
         }
+
+        if (!acpi_sdt_init((uintptr_t)rsdp->rsdt_address))
+        {
+            kprintf("RSDT initialization failed!");
+            return;
+        }
     }
     else if (revision >= 2)
     {
@@ -50,6 +58,12 @@ void acpi_init(void)
         if (!valid)
         {
             kprintf("XSDP invalid. Stopping the ACPI initialization process.\n");
+            return;
+        }
+
+        if (!acpi_sdt_init((uintptr_t)xsdp->xsdt_address))
+        {
+            kprintf("XSDT initialization failed!");
             return;
         }
     }
@@ -70,7 +84,7 @@ bool acpi_checksum_valid(const void *data, size_t length)
     return sum == 0; 
 }
 
-static bool acpi_signature_equal(const char *a, const char *b, size_t length)
+bool acpi_signature_equal(const char *a, const char *b, size_t length)
 {
     for (size_t i = 0; i < length; i++)
     {
@@ -79,49 +93,5 @@ static bool acpi_signature_equal(const char *a, const char *b, size_t length)
             return false;
         }
     }
-    return true;
-}
-
-static const char signature[] = "RSD PTR ";
-
-bool acpi_rsdp_validate(const struct acpi_rsdp *rsdp)
-{
-    if (!acpi_signature_equal(rsdp->signature, signature, 8))
-    {
-        return false;
-    }
-
-    if (!acpi_checksum_valid(rsdp, sizeof(struct acpi_rsdp)))
-    {
-        return false;
-    }
-
-    return true;
-}
-
-bool acpi_xsdp_validate(const struct acpi_xsdp *xsdp)
-{
-    if (!acpi_signature_equal(xsdp->signature, signature, 8))
-    {
-        return false;
-    }
-
-    if (xsdp->length < sizeof(struct acpi_xsdp))
-    {
-        return false;
-    }
-
-    // Legacy checksum
-    if (!acpi_checksum_valid(xsdp, sizeof(struct acpi_rsdp)))
-    {
-        return false;
-    }
-    
-    // Extended checksum
-    if (!acpi_checksum_valid(xsdp, xsdp->length))
-    {
-        return false;
-    }
-
     return true;
 }
