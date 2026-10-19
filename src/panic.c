@@ -18,8 +18,8 @@ void panic(const char *reason, struct interrupt_frame *frame)
 {
     terminal_clear(&kernel_terminal);
 
-    kprintf("Kernel Panic!!!\n");
-    kprintf("Reason: %s\n\n", reason);
+    kprintf("oepsie woepsie! the kewnel had a fowwie owo\n");
+    kprintf("weason: %s\n\n", reason);
 
     if (frame)
     {
@@ -52,7 +52,8 @@ void panic(const char *reason, struct interrupt_frame *frame)
 __attribute__((noreturn))
 void panic_end(void)
 {
-    kprintf("\nSystem halted.\n");
+    __asm__ volatile("cli");
+    kprintf("\nsystem hawted.\n");
     while (1)
     {
         __asm__ volatile("hlt");

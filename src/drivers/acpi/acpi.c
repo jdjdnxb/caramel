@@ -22,7 +22,7 @@ void acpi_init(void)
     uint64_t rsdp_address = (uint64_t)limine_rsdp_response->address;
     rsdp = (struct acpi_rsdp *)rsdp_address;
 
-    kprintf("RSDP Address: %llx\n", rsdp_address);
+    kprintf("[ACPI] RSDP found at %llx\n", rsdp_address);
 
     uint8_t revision = rsdp->revision;
 
@@ -31,19 +31,19 @@ void acpi_init(void)
         // ACPI Revision 1.0, use the legacy RSDP
         (void)xsdp;
         
-        kprintf("ACPI Revision 1.0, using the legacy RSDP.\n");
+        kprintf("[ACPI] Revision 1.0 (legacy).\n");
         
         bool valid = acpi_rsdp_validate(rsdp);
 
         if (!valid)
         {
-            kprintf("RSDP invalid. Stopping the ACPI initialization process.\n");
+            kprintf("[ACPI] RSDP invalid. Stopping the ACPI initialization process.\n");
             return;
         }
 
         if (!acpi_sdt_init((uintptr_t)rsdp->rsdt_address))
         {
-            kprintf("RSDT initialization failed!");
+            kprintf("[ACPI] RSDT initialization failed!");
             return;
         }
     }
@@ -51,25 +51,25 @@ void acpi_init(void)
     {
         // ACPI Revision 2.0+, use the XSDP
         xsdp = (struct acpi_xsdp *)rsdp_address;
-        kprintf("ACPI Revision 2.0+, using the XSDP.\n");
+        kprintf("[ACPI] Revision 2.0+.\n");
 
         bool valid = acpi_xsdp_validate(xsdp);
         
         if (!valid)
         {
-            kprintf("XSDP invalid. Stopping the ACPI initialization process.\n");
+            kprintf("[ACPI] XSDP invalid. Stopping the ACPI initialization process.\n");
             return;
         }
 
         if (!acpi_sdt_init((uintptr_t)xsdp->xsdt_address))
         {
-            kprintf("XSDT initialization failed!");
+            kprintf("[ACPI] XSDT initialization failed!");
             return;
         }
     }
     else
     {
-        kprintf("ACPI Revision unsupported or invalid.\n");
+        kprintf("[ACPI] Revision unsupported or invalid.\n");
         return;
     }
 }

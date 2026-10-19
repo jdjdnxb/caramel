@@ -37,8 +37,6 @@ void x86_64_idt_install(uint8_t vector, uint8_t ist_index, uint8_t gate_type, ui
     entry->attributes   = X86_64_IDT_ATTRIBUTE_PRESENT | X86_64_IDT_ATTRIBUTE_DPL(dpl) | X86_64_IDT_ATTRIBUTE_GATE_TYPE(gate_type); 
 
     entry->reserved     = 0x00;
-
-    kprintf("Installed handler with address %llx. Vector: %u, IST: %u, Gate Type: %llx, DPL: %llx.\n", handler_address, vector, ist_index, gate_type, dpl);
 }
 
 static void exception_handlers_install(void)
@@ -62,9 +60,7 @@ void x86_64_idt_init(void)
     idtr.offset = (uint64_t)(idt);      // Linear address of the IDT must be 64 bits wide in long mode 
     idtr.size   = sizeof(idt) - 1;
 
-    kprintf("IDTR Offset: %llx.\nIDTR Size: %llu.\n", idtr.offset, idtr.size);
-
     lidt(&idtr);
 
-    kprintf("Loaded IDT succesfully.\n");
+    kprintf("[IDT] Loaded IDT succesfully (%u entries).\n", sizeof(idt) / 16);
 }

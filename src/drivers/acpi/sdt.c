@@ -26,7 +26,7 @@ bool acpi_sdt_validate(const struct acpi_sdt_header *header)
 
 // A more professional project wouldn't do this, but fuck it, we are not a professional project.
 // We don't want to add an RSDT/XSDT check in every function requiring *acpi_sdt_find(), so
-// we're keeping a root table  in this file's scope. If this function fails, everything related 
+// we're keeping a root table in this file's scope. If this function fails, everything related 
 // to SDTs is automatically unavailable.
 static const struct acpi_sdt_header *root_table;
 
@@ -127,6 +127,5 @@ const struct acpi_sdt_header *acpi_sdt_find(const char signature[4])
             }
         }
     }
-    
     return nullptr;
 }

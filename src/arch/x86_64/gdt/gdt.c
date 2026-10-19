@@ -116,15 +116,15 @@ void x86_64_gdt_init(void)
     gdtr.offset = (uint64_t)gdt;
 
     lgdt(&gdtr);
-    kprintf("Loaded GDT successfully. We're no longer using Limine's GDT!\n");
+    kprintf("[GDT] Loaded successfully. We're no longer using Limine's GDT!\n");
     
     // We need to reload CS + the other data segments so we don't use the cached Limine ones
     cs_reload();
-    kprintf("Reloaded CS.\n");
+    kprintf("[GDT] Code segment reloaded.\n");
 
     data_segments_reload();
-    kprintf("Reloaded data segments.\n");
+    kprintf("[GDT] Data segments reloaded.\n");
 
     ltr(X86_64_TSS_SELECTOR);
-    kprintf("Loaded task register.\n");
+    kprintf("[TSS] Task register loaded.\n");
 }

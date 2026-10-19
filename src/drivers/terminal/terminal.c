@@ -39,8 +39,8 @@ void terminal_init(struct terminal *terminal)
     terminal_resize(terminal, framebuffer.width, framebuffer.height);
     terminal_set_cursor(terminal, TERMINAL_MARGIN, TERMINAL_MARGIN);
     
-    terminal_set_foreground(terminal, 0xFFFFFFFF);
-    terminal_set_background(terminal, 0x00000000);
+    terminal_set_foreground(terminal, 0xFFC9BBA6);
+    terminal_set_background(terminal, 0xFF211F1C);
 
     terminal_clear(terminal);
 }
