@@ -26,4 +26,5 @@ struct acpi_madt
     struct acpi_madt_entry_header entries[];
 };
 
-const struct acpi_madt *acpi_madt_find();
+const struct acpi_madt *acpi_madt_find(void);
+struct acpi_madt_entry_header *acpi_madt_next_entry(const struct acpi_madt *madt, const struct acpi_madt_entry_header *current);

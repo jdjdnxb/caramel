@@ -56,7 +56,7 @@ static void exception_handlers_install(void)
 void x86_64_idt_init(void)
 {
     exception_handlers_install();
-
+    
     idtr.offset = (uint64_t)(idt);      // Linear address of the IDT must be 64 bits wide in long mode 
     idtr.size   = sizeof(idt) - 1;
 

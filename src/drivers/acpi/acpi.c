@@ -10,23 +10,24 @@
 #include <limine.h>
 #include <kprintf.h>
 
-static struct limine_rsdp_response *limine_rsdp_response;
-
-static struct acpi_rsdp *rsdp;
-static struct acpi_xsdp *xsdp; 
-
 void acpi_init(void)
 {
-    limine_rsdp_response = rsdp_request.response;
+    struct limine_rsdp_response *limine_rsdp_response = rsdp_request.response;
+    
+    static struct acpi_rsdp *rsdp;
+    static struct acpi_xsdp *xsdp; 
+
+    if (!limine_rsdp_response)
+    {
+        kprintf("[ACPI] No Limine RSDP response! Stopping the ACPI initialization process.\n");
+    }
 
     uint64_t rsdp_address = (uint64_t)limine_rsdp_response->address;
     rsdp = (struct acpi_rsdp *)rsdp_address;
 
-    kprintf("[ACPI] RSDP found at %llx\n", rsdp_address);
+    kprintf("[ACPI] RSDP found at %llx.\n", rsdp_address);
 
-    uint8_t revision = rsdp->revision;
-
-    if (revision == 0)
+    if (rsdp->revision == 0)
     {
         // ACPI Revision 1.0, use the legacy RSDP
         (void)xsdp;
@@ -43,11 +44,11 @@ void acpi_init(void)
 
         if (!acpi_sdt_init((uintptr_t)rsdp->rsdt_address))
         {
-            kprintf("[ACPI] RSDT initialization failed!");
+            kprintf("[ACPI] RSDT initialization failed! Stopping the ACPI initialization process.\n");
             return;
         }
     }
-    else if (revision >= 2)
+    else if (rsdp->revision >= 2)
     {
         // ACPI Revision 2.0+, use the XSDP
         xsdp = (struct acpi_xsdp *)rsdp_address;
@@ -63,7 +64,7 @@ void acpi_init(void)
 
         if (!acpi_sdt_init((uintptr_t)xsdp->xsdt_address))
         {
-            kprintf("[ACPI] XSDT initialization failed!");
+            kprintf("[ACPI] XSDT initialization failed! Stopping the ACPI initialization process.\n");
             return;
         }
     }
@@ -72,6 +73,8 @@ void acpi_init(void)
         kprintf("[ACPI] Revision unsupported or invalid.\n");
         return;
     }
+    
+    const struct acpi_madt *madt = acpi_madt_find();
 }
 
 bool acpi_checksum_valid(const void *data, size_t length)
