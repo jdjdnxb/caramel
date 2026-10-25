@@ -8,6 +8,7 @@
 
 #include <arch/x86_64/idt/idt.h>
 #include <arch/x86_64/gdt/gdt.h>
+#include <arch/x86_64/drivers/apic/lapic.h>
 
 #include <kprintf.h>
 
@@ -23,8 +24,10 @@ void main(void)
     x86_64_idt_init();
 
     acpi_init();
+    lapic_init();
 
-    kprintf("Welcome to caramel!");
+    kprintf("APIC work paused until memory management is implemented...\n");
+    kprintf("Welcome to caramel!\n");
     
     while (1)
     {
